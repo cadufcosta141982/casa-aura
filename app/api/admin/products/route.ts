@@ -1,0 +1,3 @@
+import {requireAdmin,db,sameOrigin,jsonBody,fail,HttpError} from '@/lib/server';
+import {productSchema} from '@/lib/validation';
+export async function POST(request:Request){try{sameOrigin(request);await requireAdmin();const product=productSchema.parse(await jsonBody(request));for(const src of product.images){if(src.startsWith('/images/')&&!src.includes('..'))continue;const allowed=`${process.env.SUPABASE_URL}/storage/v1/object/public/product-images/`;if(!src.startsWith(allowed))throw new HttpError(400,'Utilize imagens enviadas pela área da marca.')}await db('products?on_conflict=id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify(product)});return Response.json({ok:true})}catch(e){return fail(e)}}

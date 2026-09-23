@@ -1,0 +1,3 @@
+import Link from 'next/link';
+export const metadata={title:'Acompanhamento do pagamento',robots:{index:false,follow:false}};
+export default function ReturnPage(){return <main className="container" id="conteudo"><div className="empty-state" style={{paddingTop:85}}><p className="eyebrow">Seu pedido, com cuidado</p><h1 style={{margin:'20px 0'}}>Estamos acompanhando<br/>seu pagamento.</h1><p>Assim que o Mercado Pago confirmar o pagamento, enviaremos a confirmação por e-mail.<br/>O retorno para esta página não significa que o pagamento foi aprovado.</p><Link href="/loja" className="button">Continuar explorando</Link></div></main>}

@@ -1,0 +1,4 @@
+import {createHash,createHmac,timingSafeEqual} from 'node:crypto';
+export const hash=(value:string)=>createHash('sha256').update(value).digest('hex');
+export function equal(a:string,b:string){const x=Buffer.from(a),y=Buffer.from(b);return x.length===y.length&&timingSafeEqual(x,y)}
+export function verifyWebhook(request:Request,secret:string){const id=new URL(request.url).searchParams.get('data.id')?.toLowerCase();const reqId=request.headers.get('x-request-id');const parts=Object.fromEntries((request.headers.get('x-signature')||'').split(',').map(p=>p.trim().split('=')));if(!id||!reqId||!/^\d+$/.test(parts.ts||'')||!/^[a-f0-9]{64}$/.test(parts.v1||''))return false;const expected=createHmac('sha256',secret).update(`id:${id};request-id:${reqId};ts:${parts.ts};`).digest('hex');return equal(expected,parts.v1)}

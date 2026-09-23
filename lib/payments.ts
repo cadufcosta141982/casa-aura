@@ -1,0 +1,3 @@
+export {verifyWebhook} from './security';
+import {HttpError} from './server';
+export async function mercado<T=Record<string,any>>(path:string,init:RequestInit={}):Promise<T>{const token=process.env.MERCADO_PAGO_ACCESS_TOKEN;if(!token)throw new HttpError(503,'Pagamento ainda não disponível.');const r=await fetch(`https://api.mercadopago.com${path}`,{...init,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json',...init.headers},signal:AbortSignal.timeout(15000)});if(!r.ok)throw new HttpError(503,'O pagamento não pôde ser iniciado. Aguarde um momento e tente novamente.');return r.json()}

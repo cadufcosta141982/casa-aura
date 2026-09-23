@@ -1,0 +1,5 @@
+import {notFound} from 'next/navigation';
+import {getCatalog} from '@/lib/catalog';
+import {Breadcrumb,ProductDetail,ProductCard} from '@/components/store/products';
+export async function generateMetadata({params}:{params:Promise<{slug:string}>}){const{slug}=await params;const{products}=await getCatalog();const p=products.find(p=>p.slug===slug);return {title:p?.name||'Peça não encontrada',description:p?.description};}
+export default async function ProductPage({params}:{params:Promise<{slug:string}>}){const{slug}=await params;const{products}=await getCatalog();const p=products.find(p=>p.slug===slug);if(!p)notFound();return <main id="conteudo" className="container"><Breadcrumb current={p.name}/><ProductDetail product={p}/><section className="section" style={{borderTop:'1px solid var(--border)'}}><div className="section-head"><h2>Peças que conversam.</h2></div><div className="product-grid">{products.filter(item=>item.id!==p.id).slice(0,4).map(p=><ProductCard product={p} key={p.id}/>)}</div></section></main>}

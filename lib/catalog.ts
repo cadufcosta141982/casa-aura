@@ -1,0 +1,21 @@
+import { cache } from 'react';
+export type Product = { id:string; slug:string; name:string; category:'gesso'|'textil'; color:string; price_cents:number; images:string[]; description:string; dimensions:string; care:string; stock:number; active:boolean; weight:number; width:number; height:number; length:number };
+const common={active:true,stock:15,weight:0.5,width:22,height:10,length:25};
+export const demoProducts:Product[]=[
+ { ...common,id:'bandeja-perola',slug:'bandeja-perola',name:'Bandeja Pérola',category:'gesso',color:'Off-white',price_cents:8900,images:['/images/pearl-tray.webp'],description:'Pequenos gestos, novos sentidos. A borda de pérolas e o toque mineral transformam essa bandeja em um lugar especial para os seus objetos favoritos.',dimensions:'22 × 15 × 3 cm',care:'Limpe com pano macio e seco. Evite imersão em água e contato direto com alimentos.' },
+ { ...common,id:'vaso-arco',slug:'vaso-arco',name:'Vaso Arco',category:'gesso',color:'Off-white',price_cents:12900,images:['/images/arch-vase.webp'],description:'Linhas suaves e uma forma que convida a olhar de novo. Uma peça escultural para flores secas, galhos ou simplesmente para estar.',dimensions:'18 × 12 × 24 cm',care:'Use apenas com flores secas. Não coloque água. Limpe com pano seco.',height:25,weight:0.8 },
+ { ...common,id:'bandeja-ondine',slug:'bandeja-ondine',name:'Bandeja Ondine',category:'gesso',color:'Terracota',price_cents:7900,images:['/images/terracotta-tray.webp'],description:'O movimento das ondas em uma peça de presença delicada. O tom terracota aquece composições e acolhe seus pequenos tesouros.',dimensions:'20 × 20 × 3 cm',care:'Limpe com pano macio. Não lave em água corrente. Uso decorativo.' },
+ { ...common,id:'almofada-trama',slug:'almofada-trama',name:'Almofada Trama',category:'textil',color:'Natural',price_cents:15900,images:['/images/ivory-cushion.webp'],description:'Uma textura que abraça. Fibras naturais, tons tranquilos e acabamento artesanal para trazer conforto aos seus cantos preferidos.',dimensions:'45 × 45 cm',care:'Lavagem delicada à mão com sabão neutro. Secar à sombra. Não usar alvejante.',width:45,length:45,height:12 },
+ { ...common,id:'caminho-linho',slug:'caminho-linho',name:'Caminho de Linho',category:'textil',color:'Natural',price_cents:13900,images:['/images/linen-runner.webp'],description:'A beleza dos encontros começa nos detalhes. Um caminho em trama natural que compõe a mesa com leveza, no cotidiano e nos dias especiais.',dimensions:'40 × 140 cm',care:'Lavar com água fria e sabão neutro. Secar à sombra. Passar em temperatura baixa.' },
+ { ...common,id:'porta-joias-concha',slug:'porta-joias-concha',name:'Porta-joias Concha',category:'gesso',color:'Off-white',price_cents:4900,images:['/images/shell-dish.webp'],description:'Um pequeno refúgio para o que você guarda com carinho. Inspirada nas formas do mar, a concha encontra lugar na penteadeira ou mesa de apoio.',dimensions:'12 × 11 × 3 cm',care:'Uso decorativo. Limpe delicadamente com pano seco. Evite umidade.',weight:0.2,width:15,length:15,height:6 }
+];
+export const money=(cents:number)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(cents/100);
+export const pixPrice=(cents:number)=>Math.round(cents*.95);
+export const hasDatabase=()=>Boolean(process.env.SUPABASE_URL&&process.env.SUPABASE_ANON_KEY);
+export const getCatalog=cache(async():Promise<{products:Product[];demo:boolean}>=>{
+ if(!hasDatabase()) return {products:demoProducts,demo:true};
+ const r=await fetch(`${process.env.SUPABASE_URL}/rest/v1/products?active=eq.true&order=created_at.asc`,{headers:{apikey:process.env.SUPABASE_ANON_KEY!,Authorization:`Bearer ${process.env.SUPABASE_ANON_KEY}`},cache:'no-store'});
+ if(!r.ok)throw new Error('Não foi possível carregar o catálogo. Tente novamente em instantes.');
+ return {products:await r.json(),demo:false};
+});
+export function shopReady(){return Boolean(process.env.LIVE_CHECKOUT_ENABLED==='true'&&hasDatabase()&&process.env.SUPABASE_SERVICE_ROLE_KEY&&process.env.MERCADO_PAGO_ACCESS_TOKEN&&process.env.MERCADO_PAGO_WEBHOOK_SECRET&&process.env.MELHOR_ENVIO_TOKEN&&process.env.SHIPPING_ORIGIN_CEP&&process.env.NEXT_PUBLIC_SITE_URL&&process.env.PRIVACY_EMAIL&&process.env.LEGAL_BUSINESS_NAME&&process.env.BUSINESS_TAX_ID&&process.env.RESEND_API_KEY&&process.env.EMAIL_FROM&&process.env.CRON_SECRET);}

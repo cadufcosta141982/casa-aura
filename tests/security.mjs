@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import {mkdir,readFile,writeFile,rm} from 'node:fs/promises';
+import {createHmac} from 'node:crypto';
+import ts from 'typescript';
+await mkdir('.qa',{recursive:true});
+for(const name of ['security','validation','catalog']){
+ const source=await readFile(`lib/${name}.ts`,'utf8');
+ await writeFile(`.qa/${name}.mjs`,ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ES2022}}).outputText);
+}
+const {verifyWebhook,equal}=await import('../.qa/security.mjs');
+const {validCpf,itemsSchema,checkoutSchema}=await import('../.qa/validation.mjs');
+const {pixPrice,shopReady}=await import('../.qa/catalog.mjs');
+const secret='local-test-only';
+const signature=createHmac('sha256',secret).update('id:123456;request-id:request-1;ts:1234567890;').digest('hex');
+const request=(id,sig)=>new Request(`https://store.example/api/webhooks/mercadopago?data.id=${id}`,{headers:{'x-request-id':'request-1','x-signature':`ts=1234567890,v1=${sig}`}});
+assert.equal(verifyWebhook(request('123456',signature),secret),true);
+assert.equal(verifyWebhook(request('999999',signature),secret),false);
+assert.equal(verifyWebhook(request('123456','0'.repeat(64)),secret),false);
+assert.equal(verifyWebhook(new Request('https://store.example/api/webhooks/mercadopago'),secret),false);
+assert.equal(equal('a','aa'),false);
+assert.equal(validCpf('52998224725'),true);
+assert.equal(validCpf('11111111111'),false);
+assert.equal(validCpf('52998224724'),false);
+assert.equal(itemsSchema.safeParse([{id:'bandeja-perola',quantity:0}]).success,false);
+assert.equal(itemsSchema.safeParse([{id:'bandeja-perola',quantity:1},{id:'bandeja-perola',quantity:1}]).success,false);
+assert.equal(itemsSchema.safeParse([{id:'bandeja-perola',quantity:1,price_cents:1}]).success,false);
+assert.equal(checkoutSchema.safeParse({}).success,false);
+assert.equal(pixPrice(8900),8455);
+assert.equal(pixPrice(13900*2),26410);
+assert.equal(shopReady(),false);
+await rm('.qa',{recursive:true,force:true});
+console.log('15 checks passed: webhook authenticity, CPF, cart validation, discount and closed checkout.');
