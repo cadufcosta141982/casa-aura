@@ -14,7 +14,7 @@ export const pixPrice=(cents:number)=>Math.round(cents*.95);
 export const hasDatabase=()=>Boolean(process.env.SUPABASE_URL&&process.env.SUPABASE_ANON_KEY);
 export const getCatalog=cache(async():Promise<{products:Product[];demo:boolean}>=>{
  if(!hasDatabase()) return {products:demoProducts,demo:true};
- const r=await fetch(`${process.env.SUPABASE_URL}/rest/v1/products?active=eq.true&order=created_at.asc`,{headers:{apikey:process.env.SUPABASE_ANON_KEY!,Authorization:`Bearer ${process.env.SUPABASE_ANON_KEY}`},cache:'no-store'});
+ const r=await fetch(`${process.env.SUPABASE_URL}/rest/v1/products?active=eq.true&order=created_at.asc`,{headers:{apikey:process.env.SUPABASE_ANON_KEY!},cache:'no-store'});
  if(!r.ok)throw new Error('Não foi possível carregar o catálogo. Tente novamente em instantes.');
  return {products:await r.json(),demo:false};
 });
