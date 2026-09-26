@@ -18,4 +18,4 @@ export const getCatalog=cache(async():Promise<{products:Product[];demo:boolean}>
  if(!r.ok)throw new Error('Não foi possível carregar o catálogo. Tente novamente em instantes.');
  return {products:await r.json(),demo:false};
 });
-export function shopReady(){return Boolean(process.env.LIVE_CHECKOUT_ENABLED==='true'&&hasDatabase()&&process.env.SUPABASE_SERVICE_ROLE_KEY&&process.env.MERCADO_PAGO_ACCESS_TOKEN&&process.env.MERCADO_PAGO_WEBHOOK_SECRET&&process.env.MELHOR_ENVIO_TOKEN&&process.env.SHIPPING_ORIGIN_CEP&&process.env.NEXT_PUBLIC_SITE_URL&&process.env.PRIVACY_EMAIL&&process.env.LEGAL_BUSINESS_NAME&&process.env.BUSINESS_TAX_ID&&process.env.RESEND_API_KEY&&process.env.EMAIL_FROM&&process.env.CRON_SECRET);}
+export function shopReady(){return Boolean(process.env.LIVE_CHECKOUT_ENABLED==='true'&&hasDatabase()&&process.env.SUPABASE_SERVICE_ROLE_KEY&&process.env.MERCADO_PAGO_ACCESS_TOKEN&&process.env.MERCADO_PAGO_WEBHOOK_SECRET&&process.env.MELHOR_ENVIO_TOKEN&&process.env.NEXT_PUBLIC_SITE_URL&&process.env.RESEND_API_KEY&&process.env.EMAIL_FROM&&process.env.CRON_SECRET);}
