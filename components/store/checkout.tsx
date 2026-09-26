@@ -6,7 +6,7 @@ import {RadioGroup,RadioGroupItem} from '@/components/ui/radio-group';
 import {Checkbox} from '@/components/ui/checkbox';
 import {useCart} from './provider';
 import {Breadcrumb,ShippingCalculator} from './products';
-import {money,pixPrice} from '@/lib/catalog';
+import {money} from '@/lib/catalog';
 import type {ShippingOption} from '@/lib/types';
 import {toast} from 'sonner';
 export function Checkout({enabled,pixDiscountPercent=5,maxInstallments=12}:{enabled:boolean;pixDiscountPercent?:number;maxInstallments?:number}){const{items,products,ready,clear}=useCart();const[method,setMethod]=useState('pix'),[shipping,setShipping]=useState<ShippingOption|null>(null),[cep,setCep]=useState(''),[agreed,setAgreed]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[result,setResult]=useState<{order_id:string;token:string;expires_at:string;qr_code:string;qr_code_base64:string}|null>(null),[paid,setPaid]=useState(false),[expired,setExpired]=useState(false);const subtotal=items.reduce((s,i)=>s+(products.find(p=>p.id===i.id)?.price_cents||0)*i.quantity,0);const discountedPix=Math.round(subtotal*(1-Math.max(0,Math.min(100,pixDiscountPercent))/100));const total=(method==='pix'?discountedPix:subtotal)+(shipping?.price_cents||0);
